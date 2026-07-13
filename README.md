@@ -8,14 +8,20 @@ FLASC converts vehicle audio settings for **GTA IV** from the community-defined 
 
 Version 2.0 fully replaces the previous RAGEAT-based binary patching workflow with this ivam-first approach.
 
-## Features
-
-- Converts FLA `.ini` vehicle audio settings into ivam-compatible `.json` format
+## Usage
+ 
+1. Run `FLASC.exe`.
+2. Choose an option from the menu.
+### Menu options
+ 
+| Option | Description |
+|---|---|
+| 1. Convert `.ini` to `.json` | Converts a FLA-format `.ini` vehicle audio file into an ivam-compatible `.json`. Enter the path to the input file, or just its filename if it's placed next to the executable — the converted file will appear in an `output` folder created next to the executable. Currently only supports car, boat and helicopter structs. |
 
 ## Related Projects
 
-- **ivam** — [GTAAudioMetadataTool_V2](https://github.com/ook3D/GTAAudioMetadataTool_V2) — the target format and tool this project outputs for
-- **fastman92 Limit Adjuster (FLA)** — [fastman92_limit_adjuster](https://github.com/fastman92/fastman92_limit_adjuster) — source of the legacy `.ini` format this project converts from
+- **[GTAAudioMetadataTool_V2](https://github.com/ook3D/GTAAudioMetadataTool_V2)** — the target format and tool this project outputs for
+- **[fastman92_limit_adjuster](https://github.com/fastman92/fastman92_limit_adjuster)** — source of the legacy `.ini` format this project converts from
 
 ## Credits
 
