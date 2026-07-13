@@ -2,12 +2,10 @@
 .vs/
 
 # Build output
-FLASC/
 Debug/
 Release/
 x64/
 x86/
-.vs/
 out/
 
 # Resource compiler

@@ -15,51 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CarSchema.cpp">
+    <ClCompile Include="src\CarSchema.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="HeliBoatRules.cpp">
+    <ClCompile Include="src\HeliBoatRules.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="IniLoader.cpp">
+    <ClCompile Include="src\IniLoader.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="JoaatHash.cpp">
+    <ClCompile Include="src\JoaatHash.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Json.cpp">
+    <ClCompile Include="src\Json.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="VehicleJsonBuilder.cpp">
+    <ClCompile Include="src\VehicleJsonBuilder.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CarSchema.h">
+    <ClInclude Include="src\CarSchema.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="FieldSpec.h">
+    <ClInclude Include="src\FieldSpec.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="HeliBoatRules.h">
+    <ClInclude Include="src\HeliBoatRules.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="IniLoader.h">
+    <ClInclude Include="src\IniLoader.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="JoaatHash.h">
+    <ClInclude Include="src\JoaatHash.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Json.h">
+    <ClInclude Include="src\Json.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="VehicleJsonBuilder.h">
+    <ClInclude Include="src\VehicleJsonBuilder.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-	<ClInclude Include="resource.h">
+	<ClInclude Include="resources\resource.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
@@ -69,7 +69,7 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="version.rc">
+    <ResourceCompile Include="resources\version.rc">
       <Filter>Файлы ресурсов</Filter>
     </ResourceCompile>
   </ItemGroup>
