@@ -1,0 +1,43 @@
+# Visual Studio
+.vs/
+
+# Build output
+FLASC/
+Debug/
+Release/
+x64/
+x86/
+.vs/
+out/
+
+# Resource compiler
+*.aps
+*.res
+
+# User settings
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Intermediate files
+*.obj
+*.pch
+*.idb
+*.ilk
+*.ipdb
+*.iobj
+*.tlog
+*.lastbuildstate
+
+# Debug symbols
+*.pdb
+
+# Binaries
+*.exe
+*.dll
+*.lib
+*.exp
+
+# Logs
+*.log

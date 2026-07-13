@@ -154,10 +154,14 @@
     <ClInclude Include="IniLoader.h" />
     <ClInclude Include="JoaatHash.h" />
     <ClInclude Include="Json.h" />
+	<ClInclude Include="resource.h" />
     <ClInclude Include="VehicleJsonBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
