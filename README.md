@@ -16,7 +16,8 @@ Version 2.0 fully replaces the previous RAGEAT-based binary patching workflow wi
  
 | Option | Description |
 |---|---|
-| 1. Convert `.ini` to `.json` | Converts a FLA-format `.ini` vehicle audio file into an ivam-compatible `.json`. Enter the path to the input file, or just its filename if it's placed next to the executable — the converted file will appear in an `output` folder created next to the executable. Currently only supports car, boat and helicopter structs. |
+| 1. Convert `.ini` to `.json` | Converts a FLA-format `.ini` vehicle audio file into an ivam-compatible `.json`. Enter the path to the input file, or just its filename if it's placed next to the executable — the converted file will be saved as `output/converted.json`. Currently only supports car, boat and helicopter structs. |
+| 2. Merge `.json` files | Merges two ivam-compatible `.json` files into a single output file. Enter the paths to both input files, or just their filenames if they're placed next to the executable — the merged file will be saved as `output/merged.json`. |
 
 ## Related Projects
 
