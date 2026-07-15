@@ -24,7 +24,7 @@ public:
 
 protected:
     static void WriteIndent(std::string& out, int indent) {
-        out.append(static_cast<size_t>(indent) * 2, ' ');
+        out.append(static_cast<size_t>(indent), '\t');
     }
 };
 

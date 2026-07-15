@@ -12,6 +12,7 @@ add_executable(FLASC
     src/IniLoader.cpp
     src/JoaatHash.cpp
     src/Json.cpp
+    src/JsonMerge.cpp
 )
 
 if(MSVC)

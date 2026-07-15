@@ -149,6 +149,7 @@
     <ClCompile Include="src\Json.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\VehicleJsonBuilder.cpp" />
+	<ClCompile Include="src\JsonMerge.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CarSchema.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="src\Json.h" />
 	<ClInclude Include="resources\resource.h" />
     <ClInclude Include="src\VehicleJsonBuilder.h" />
+	<ClCompile Include="src\JsonMerge.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

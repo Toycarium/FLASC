@@ -18,7 +18,7 @@ const std::set<std::string> kHeliByteOffsets = {"A8", "A9"};
 // structType 7 (boat) - offsets confirmed against the "dinghy" ini section
 const std::set<std::string> kBoatFloatOffsets = {"46", "4A", "56", "5A", "66", "6A", "76", "7A", "8A", "8E"};
 const std::set<std::string> kBoatRawIntOffsets = {"9E", "A6"};
-const std::set<std::string> kBoatByteOffsets = {"B6", "B7", "C8"};
+const std::set<std::string> kBoatByteOffsets = {"B6", "B7"};
 const std::string kBoatFlagsOffset = "42";
 
 bool IsHexDigits(const std::string& s) {

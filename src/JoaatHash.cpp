@@ -23,6 +23,20 @@ uint32_t Compute(const std::string& str) {
     return hash;
 }
 
+uint32_t ComputeFieldHash(const std::string& soundName) {
+    if (soundName.empty())
+        return 0;
+
+    std::string lower = soundName;
+    std::transform(lower.begin(), lower.end(), lower.begin(),
+                    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+    if (lower == "null")
+        return 0;
+
+    return Compute(lower);
+}
+
 std::string ToJsonHashString(const std::string& soundName) {
     if (soundName.empty()) {
         return "0x00000000";

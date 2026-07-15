@@ -12,6 +12,11 @@ namespace JoaatHash {
 
 uint32_t Compute(const std::string& str);
 
+// The raw 4-byte hash value that gets written into the binary struct: 0 for the
+// FLASC "NULL" sentinel (meaning "write 4 zero bytes"), otherwise Compute() on
+// the lower-cased string.
+uint32_t ComputeFieldHash(const std::string& soundName);
+
 // Produces the same textual representation ivam's JSON uses for a hash field:
 // the lower-cased sound name if we have one, or "0x00000000" for the FLASC
 // "NULL" sentinel (meaning "write 4 zero bytes", i.e. hash == 0 - NOT the joaat

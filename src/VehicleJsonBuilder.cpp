@@ -1,7 +1,10 @@
 #include "VehicleJsonBuilder.h"
 
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 #include <stdexcept>
+#include <vector>
 
 #include "CarSchema.h"
 #include "HeliBoatRules.h"
@@ -80,24 +83,110 @@ void BuildCarMetadata(const IniSection& section, json::JObject& metadata) {
     }
 }
 
+// Appends the little-endian byte representation of one field's value to buf,
+// using the exact same width/conversion rules ConvertValue() uses for JSON -
+// just written as raw bytes instead of a named JSON field. This is what lets
+// gameHeli/gameBoat round-trip through the same opaque "Data" hex-blob format
+// ivam itself uses for these two (still-unnamed) types.
+void AppendFieldBytes(std::vector<uint8_t>& buf, FieldKind kind, ValueRule rule,
+                       const std::string& raw) {
+    auto pushLE = [&buf](uint32_t v, int numBytes) {
+        for (int i = 0; i < numBytes; ++i)
+            buf.push_back(static_cast<uint8_t>((v >> (8 * i)) & 0xFF));
+    };
+
+    switch (kind) {
+        case FieldKind::Hash:
+            pushLE(JoaatHash::ComputeFieldHash(raw), 4);
+            break;
+
+        case FieldKind::Flags4:
+            pushLE(ParseHex(raw), 4);
+            break;
+
+        case FieldKind::Float: {
+            float f = static_cast<float>(std::stod(raw));
+            uint32_t bits;
+            std::memcpy(&bits, &f, sizeof(bits));
+            pushLE(bits, 4);
+            break;
+        }
+
+        case FieldKind::Int8:
+        case FieldKind::UInt8:
+            pushLE(static_cast<uint32_t>(std::stol(raw)) & 0xFF, 1);
+            break;
+
+        case FieldKind::Int16: {
+            long long v;
+            if (rule == ValueRule::Scale100)
+                v = std::llround(std::stod(raw) * 100.0);
+            else if (rule == ValueRule::Scale1200)
+                v = std::llround(std::stod(raw) * 1200.0);
+            else
+                v = std::stol(raw);
+            pushLE(static_cast<uint16_t>(static_cast<int16_t>(v)), 2);
+            break;
+        }
+
+        case FieldKind::Int32: {
+            long long v;
+            if (rule == ValueRule::Scale100)
+                v = std::llround(std::stod(raw) * 100.0);
+            else if (rule == ValueRule::Scale1200)
+                v = std::llround(std::stod(raw) * 1200.0);
+            else
+                v = std::stol(raw);
+            pushLE(static_cast<uint32_t>(static_cast<int32_t>(v)), 4);
+            break;
+        }
+    }
+}
+
+std::string BytesToHexString(const std::vector<uint8_t>& bytes) {
+    static const char* hex = "0123456789abcdef";
+    std::string out;
+    out.reserve(bytes.size() * 3);
+    for (size_t i = 0; i < bytes.size(); ++i) {
+        if (i > 0)
+            out += ' ';
+        out += hex[(bytes[i] >> 4) & 0xF];
+        out += hex[bytes[i] & 0xF];
+    }
+    return out;
+}
+
+// gameHeli / gameBoat don't have a known field schema in ivam either - it only
+// stores them as an opaque byte blob ("Data"). Rather than inventing our own
+// named-field JSON (which nothing else could read), we reconstruct the exact
+// original binary payload - using the same offset/width rules HeliBoatRules
+// already established - and expose it the same way ivam does, for maximum
+// compatibility with the wider toolchain.
 void BuildHeliOrBoatMetadata(const IniSection& section, json::JObject& metadata, bool isBoat) {
+    std::vector<uint8_t> bytes;
     for (const auto& kv : section.entries) {
         const std::string& key = kv.first;
         if (key == "structType" || key == "field_1" || key == "flags")
             continue; // header fields, already handled
 
+        if (isBoat && key == "field_C8")
+            continue; // leftover artifact from the original .ini decode - always 0 across
+                       // every vanilla boat, and one byte past the true 190-byte struct
+                       // size ivam itself uses. Not a real field.
+
         auto classification = isBoat ? HeliBoatRules::ClassifyBoatField(key)
                                       : HeliBoatRules::ClassifyHeliField(key);
 
         if (!classification.has_value()) {
-            // Plain sound/hash field - keep its existing (already meaningful) name.
-            metadata.Set(key, json::MakeString(JoaatHash::ToJsonHashString(kv.second)));
+            // Plain sound/hash field.
+            AppendFieldBytes(bytes, FieldKind::Hash, ValueRule::Raw, kv.second);
             continue;
         }
 
-        metadata.Set(classification->jsonKey,
-                     ConvertValue(kv.second, classification->kind, classification->rule));
+        AppendFieldBytes(bytes, classification->kind, classification->rule, kv.second);
     }
+
+    metadata.Set("Data", json::MakeString(BytesToHexString(bytes)));
 }
 
 } // namespace

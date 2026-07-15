@@ -7,6 +7,7 @@
 
 #include "IniLoader.h"
 #include "Json.h"
+#include "JsonMerge.h"
 #include "VehicleJsonBuilder.h"
 
 #if defined(_WIN32)
@@ -42,29 +43,33 @@ std::string Trim(const std::string& s) {
     return s.substr(start, end - start + 1);
 }
 
-bool EndsWithIni(const std::string& s) {
-    if (s.size() < 4)
+bool EndsWithExt(const std::string& s, const std::string& ext) {
+    if (s.size() < ext.size())
         return false;
-    std::string tail = s.substr(s.size() - 4);
+    std::string tail = s.substr(s.size() - ext.size());
     for (auto& c : tail)
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-    return tail == ".ini";
+    std::string lowerExt = ext;
+    for (auto& c : lowerExt)
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    return tail == lowerExt;
 }
 
-// Resolves what the user typed into an actual .ini file path. Tries, in order:
+// Resolves what the user typed into an actual file path. Tries, in order:
 //  1) exactly what they typed (relative to the current working directory, or absolute)
-//  2) the same, with ".ini" appended, if they left the extension off
+//  2) the same, with the given extension appended, if they left it off
 //  3) the same two attempts again, but next to the .exe itself, so a user who just
-//     types a bare name (e.g. "myVehicles") finds "myVehicles.ini" sitting alongside
-//     the program without having to type a full path.
-std::string ResolveIniPath(const std::string& rawInput, const std::string& exeDir) {
+//     types a bare name finds the file sitting alongside the program without having
+//     to type a full path.
+std::string ResolvePath(const std::string& rawInput, const std::string& exeDir,
+                        const std::string& ext) {
     std::string input = Trim(rawInput);
     if (input.empty())
         return "";
 
     std::vector<std::string> candidates = {input};
-    if (!EndsWithIni(input))
-        candidates.push_back(input + ".ini");
+    if (!EndsWithExt(input, ext))
+        candidates.push_back(input + ext);
 
     size_t count = candidates.size();
     for (size_t i = 0; i < count; ++i)
@@ -78,12 +83,34 @@ std::string ResolveIniPath(const std::string& rawInput, const std::string& exeDi
     return "";
 }
 
+std::string ReadWholeFile(const std::string& path) {
+    std::ifstream in(path, std::ios::binary);
+    if (!in.is_open())
+        throw std::runtime_error("Could not open file: " + path);
+    std::ostringstream ss;
+    ss << in.rdbuf();
+    return ss.str();
+}
+
+void WriteOutputFile(const std::string& exeDir, const std::string& fileName,
+                     const std::string& contents) {
+    fs::path outputDir = fs::path(exeDir) / "output";
+    fs::create_directories(outputDir);
+    fs::path outputPath = outputDir / fileName;
+
+    std::ofstream out(outputPath, std::ios::binary);
+    out << contents;
+    out.close();
+
+    std::cout << "Written to: " << outputPath.string() << "\n";
+}
+
 void ConvertIniToJson(const std::string& exeDir) {
     std::cout << "Path to .ini file: ";
     std::string input;
     std::getline(std::cin, input);
 
-    std::string path = ResolveIniPath(input, exeDir);
+    std::string path = ResolvePath(input, exeDir, ".ini");
     if (path.empty()) {
         std::cout << "File not found.\n";
         return;
@@ -114,16 +141,52 @@ void ConvertIniToJson(const std::string& exeDir) {
         }
     }
 
-    fs::path outputDir = fs::path(exeDir) / "output";
-    fs::create_directories(outputDir);
-    fs::path outputPath = outputDir / (fs::path(path).stem().string() + ".json");
-
-    std::ofstream out(outputPath, std::ios::binary);
-    out << root->ToJsonString();
-    out.close();
-
     std::cout << "Converted " << ok << " section(s), " << failed << " failed.\n";
-    std::cout << "Written to: " << outputPath.string() << "\n";
+    WriteOutputFile(exeDir, "converted.json", root->ToJsonString());
+}
+
+void MergeJsonFiles(const std::string& exeDir) {
+    std::cout << "Path to .json file to insert: ";
+    std::string insertInput;
+    std::getline(std::cin, insertInput);
+    std::string insertPath = ResolvePath(insertInput, exeDir, ".json");
+    if (insertPath.empty()) {
+        std::cout << "File not found.\n";
+        return;
+    }
+
+    std::cout << "Path to .json file to merge into: ";
+    std::string baseInput;
+    std::getline(std::cin, baseInput);
+    std::string basePath = ResolvePath(baseInput, exeDir, ".json");
+    if (basePath.empty()) {
+        std::cout << "File not found.\n";
+        return;
+    }
+
+    try {
+        std::string insertText = ReadWholeFile(insertPath);
+        std::string baseText = ReadWholeFile(basePath);
+
+        auto insertEntries = flasc::JsonMerge::SplitTopLevelObject(insertText);
+        auto baseEntries = flasc::JsonMerge::SplitTopLevelObject(baseText);
+
+        std::vector<std::string> duplicates;
+        std::string merged = flasc::JsonMerge::Merge(baseEntries, insertEntries, duplicates);
+
+        if (!duplicates.empty()) {
+            std::cout << "Warning: " << duplicates.size()
+                      << " key(s) exist in both files (both copies were kept):\n";
+            for (const auto& key : duplicates)
+                std::cout << "  " << key << "\n";
+        }
+
+        std::cout << "Merged " << insertEntries.size() << " entrie(s) into "
+                  << baseEntries.size() << " existing entrie(s).\n";
+        WriteOutputFile(exeDir, "merged.json", merged);
+    } catch (const std::exception& ex) {
+        std::cout << "Merge failed: " << ex.what() << "\n";
+    }
 }
 
 } // namespace
@@ -133,8 +196,9 @@ int main() {
 
     while (true) {
         std::cout << "\nFLASC\n";
-        std::cout << "1) Convert from .ini to .json (FLA -> ivam)\n";
-        std::cout << "2) Exit\n";
+        std::cout << "1) Convert .ini to .json (FLA -> ivam)\n";
+        std::cout << "2) Merge .json files\n";
+        std::cout << "3) Exit\n";
         std::cout << "> ";
 
         std::string choice;
@@ -144,6 +208,8 @@ int main() {
         if (choice == "1") {
             ConvertIniToJson(exeDir);
         } else if (choice == "2") {
+            MergeJsonFiles(exeDir);
+        } else if (choice == "3") {
             break;
         } else {
             std::cout << "Unrecognised option.\n";
