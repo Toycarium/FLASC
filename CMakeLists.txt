@@ -13,6 +13,8 @@ add_executable(FLASC
     src/JoaatHash.cpp
     src/Json.cpp
     src/JsonMerge.cpp
+    src/IvamRunner.cpp
+    src/PathUtil.cpp
 )
 
 if(MSVC)

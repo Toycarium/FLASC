@@ -36,6 +36,12 @@
     <ClCompile Include="src\VehicleJsonBuilder.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+	<ClCompile Include="src\IvamRunner.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+	<ClInclude Include="src\PathUtil.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CarSchema.h">
@@ -57,6 +63,13 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="src\VehicleJsonBuilder.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+	<ClInclude Include="src\IvamRunner.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+	</ClInclude>
+	<ClInclude Include="src\PathUtil.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
 	<ClInclude Include="resources\resource.h">
